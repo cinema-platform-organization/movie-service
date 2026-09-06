@@ -20,7 +20,7 @@ export const movies = pgTable("movies", {
 	banner: text("banner"),
 	duration: integer("duration").default(0).notNull(),
 	releaseYear: integer("release_year"),
-	releaseDate: timestamp("release_data"),
+	releaseDate: timestamp("release_date"),
 	ratingAge: integer("rating_age").default(0),
 	country: varchar("country", { length: 255 }),
 	categoryId: uuid("category_id").references(() => categories.id, {

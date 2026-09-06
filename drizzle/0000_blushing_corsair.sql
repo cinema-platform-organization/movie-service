@@ -18,7 +18,7 @@ CREATE TABLE "movies" (
 	"banner" text,
 	"duration" integer DEFAULT 0 NOT NULL,
 	"release_year" integer,
-	"release_data" timestamp,
+	"release_date" timestamp,
 	"rating_age" integer DEFAULT 0,
 	"country" varchar(255),
 	"category_id" uuid,

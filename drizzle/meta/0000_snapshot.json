@@ -1,5 +1,5 @@
 {
-  "id": "91044558-c351-4b18-a97b-df9370093664",
+  "id": "2a8e1490-093c-4a45-88d9-fa70d38ba39c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -126,8 +126,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "release_data": {
-          "name": "release_data",
+        "release_date": {
+          "name": "release_date",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
