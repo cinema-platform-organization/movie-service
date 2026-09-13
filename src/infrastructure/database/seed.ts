@@ -1,9 +1,34 @@
 import * as dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/node-postgres";
+import * as fs from "fs";
+import * as path from "path";
 import { Pool } from "pg";
 
 import { categories } from "./drizzle/schema/category.schema";
 import { movies } from "./drizzle/schema/movie.schema";
+
+const isProduction = process.env.NODE_ENV === "production";
+
+if (!isProduction) {
+	const envName = process.env.NODE_ENV || "development";
+	const envFileName = `.env.${envName}.local`;
+	const envPath = path.resolve(process.cwd(), envFileName);
+
+	if (fs.existsSync(envPath)) {
+		dotenv.config({ path: envPath });
+		console.log(`[Seeder] Loaded environment from ${envFileName}`);
+	} else {
+		const fallbackPath = path.resolve(process.cwd(), ".env");
+		if (fs.existsSync(fallbackPath)) {
+			dotenv.config({ path: fallbackPath });
+			console.log(`[Seeder] Loaded fallback environment from .env`);
+		}
+	}
+} else {
+	console.log(
+		"[Seeder] Running in production. Using system environment variables.",
+	);
+}
 
 const CATEGORIES = [
 	{
@@ -312,8 +337,6 @@ const MOVIES = [
 		category: "action",
 	},
 ];
-
-dotenv.config();
 
 const pool = new Pool({
 	host: process.env.DATABASE_HOST,
