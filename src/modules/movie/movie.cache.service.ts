@@ -28,6 +28,7 @@ export class MovieCacheService {
 		category?: string;
 		random?: boolean;
 		limit?: number;
+		page?: number;
 	}): Promise<T | null> {
 		return this.get(MovieCacheKeys.all(params));
 	}
@@ -37,6 +38,7 @@ export class MovieCacheService {
 			category?: string;
 			random?: boolean;
 			limit?: number;
+			page?: number;
 		},
 		value: unknown,
 	) {

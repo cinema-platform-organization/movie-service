@@ -20,30 +20,29 @@ export class MovieService {
 		private readonly movieCacheService: MovieCacheService,
 	) {}
 
-	public async getAll(data: ListMoviesRequest) {
+	public async getAll(data: ListMoviesRequest): Promise<ListMoviesResponse> {
 		const filter = {
 			category: data.category ?? undefined,
 			random: data.random === true,
-			limit: data.limit > 0 ? data.limit : undefined,
+			limit: data.limit > 0 ? data.limit : 20,
+			page: data.random ? 1 : data.page > 0 ? data.page : 1,
 		};
 
 		const cached =
-			await this.movieCacheService.getAll<ListMoviesResponse["movies"]>(
-				filter,
-			);
+			await this.movieCacheService.getAll<ListMoviesResponse>(filter);
 
 		if (cached) {
-			return { movies: cached };
+			return cached;
 		}
 
-		const movies = await this.movieRepository.findAll(filter);
-		const mapped = movies.map(movie => MovieMapper.toMovie(movie));
+		const { rows, total } = await this.movieRepository.findAll(filter);
+		const mapped = rows.map(movie => MovieMapper.toMovie(movie));
 
-		await this.movieCacheService.setAll(filter, mapped);
+		const response: ListMoviesResponse = { movies: mapped, total };
 
-		return {
-			movies: mapped,
-		};
+		await this.movieCacheService.setAll(filter, response);
+
+		return response;
 	}
 
 	public async getOne(data: GetMovieRequest) {

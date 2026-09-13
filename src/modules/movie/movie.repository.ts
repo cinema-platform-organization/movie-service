@@ -1,6 +1,6 @@
 import type { ListMoviesRequest } from "@cinema-platform/contracts/gen/ts/movie";
 import { Inject, Injectable } from "@nestjs/common";
-import { and, desc, eq, gt, isNull, lte, or, sql } from "drizzle-orm";
+import { and, count, desc, eq, gt, isNull, lte, or, sql } from "drizzle-orm";
 import { NodePgDatabase } from "drizzle-orm/node-postgres";
 
 import { DRIZZLE_DB } from "@/infrastructure/database/drizzle/drizzle.provider";
@@ -17,25 +17,34 @@ export class MovieRepository {
 		const where = this.buildWhere(filter);
 		const orderBy = this.buildOrder(filter);
 
-		const query = this.db
-			.select({
-				id: movies.id,
-				title: movies.title,
-				slug: movies.slug,
-				poster: movies.poster,
-				ratingAge: movies.ratingAge,
-				releaseDate: movies.releaseDate,
-			})
-			.from(movies)
-			.leftJoin(categories, eq(movies.categoryId, categories.id))
-			.where(where)
-			.orderBy(orderBy);
+		const limit = filter.limit && filter.limit > 0 ? filter.limit : 20;
+		const page = filter.page && filter.page > 0 ? filter.page : 1;
+		const offset = filter.random ? 0 : (page - 1) * limit;
 
-		if (filter.limit && filter.limit > 0) {
-			return query.limit(filter.limit);
-		}
+		const [rows, [{ total }]] = await Promise.all([
+			this.db
+				.select({
+					id: movies.id,
+					title: movies.title,
+					slug: movies.slug,
+					poster: movies.poster,
+					ratingAge: movies.ratingAge,
+					releaseDate: movies.releaseDate,
+				})
+				.from(movies)
+				.leftJoin(categories, eq(movies.categoryId, categories.id))
+				.where(where)
+				.orderBy(orderBy)
+				.limit(limit)
+				.offset(offset),
+			this.db
+				.select({ total: count() })
+				.from(movies)
+				.leftJoin(categories, eq(movies.categoryId, categories.id))
+				.where(where),
+		]);
 
-		return query;
+		return { rows, total };
 	}
 
 	public async findBySlug(slug: string) {
