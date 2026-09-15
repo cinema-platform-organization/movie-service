@@ -65,6 +65,53 @@ export class MovieRepository {
 			.then(r => r[0] ?? null);
 	}
 
+	public async create(data: {
+		title: string;
+		slug?: string;
+		description: string;
+		poster: string;
+		banner?: string;
+		duration: number;
+		releaseYear?: number;
+		releaseDate?: Date;
+		ratingAge?: number;
+		country?: string;
+		categoryId?: string;
+	}) {
+		const rows = await this.db.insert(movies).values(data).returning();
+
+		return rows[0];
+	}
+
+	public async update(
+		id: string,
+		data: Partial<{
+			title: string;
+			slug: string;
+			description: string;
+			poster: string;
+			banner: string;
+			duration: number;
+			releaseYear: number;
+			releaseDate: Date;
+			ratingAge: number;
+			country: string;
+			categoryId: string;
+		}>,
+	) {
+		const rows = await this.db
+			.update(movies)
+			.set(data)
+			.where(eq(movies.id, id))
+			.returning();
+
+		return rows[0] ?? null;
+	}
+
+	public async delete(id: string): Promise<void> {
+		await this.db.delete(movies).where(eq(movies.id, id));
+	}
+
 	private buildWhere(filter: ListMoviesRequest) {
 		const now = new Date();
 

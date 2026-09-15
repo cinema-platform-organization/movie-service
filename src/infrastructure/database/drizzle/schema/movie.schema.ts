@@ -24,7 +24,7 @@ export const movies = pgTable("movies", {
 	ratingAge: integer("rating_age").default(0),
 	country: varchar("country", { length: 255 }),
 	categoryId: uuid("category_id").references(() => categories.id, {
-		onDelete: "cascade",
+		onDelete: "restrict",
 	}),
 });
 

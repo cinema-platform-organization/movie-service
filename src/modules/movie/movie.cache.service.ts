@@ -24,6 +24,10 @@ export class MovieCacheService {
 		return this.redisService.setJson(key, value, this.CACHE_TTL);
 	}
 
+	public async delete(key: string): Promise<void> {
+		await this.redisService.del(key);
+	}
+
 	public getAll<T = unknown>(params: {
 		category?: string;
 		random?: boolean;
