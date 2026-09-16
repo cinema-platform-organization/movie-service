@@ -28,6 +28,27 @@ export class MovieCacheService {
 		await this.redisService.del(key);
 	}
 
+	public async deleteByPattern(pattern: string): Promise<void> {
+		const stream = this.redisService.scanStream({
+			match: pattern,
+			count: 100,
+		});
+
+		const pipeline = this.redisService.pipeline();
+		let found = false;
+
+		for await (const keys of stream as AsyncIterable<string[]>) {
+			if (keys.length) {
+				found = true;
+				keys.forEach((key: string) => pipeline.del(key));
+			}
+		}
+
+		if (found) {
+			await pipeline.exec();
+		}
+	}
+
 	public getAll<T = unknown>(params: {
 		category?: string;
 		random?: boolean;
@@ -47,5 +68,9 @@ export class MovieCacheService {
 		value: unknown,
 	) {
 		return this.set(MovieCacheKeys.all(params), value);
+	}
+
+	public invalidateAllLists(): Promise<void> {
+		return this.deleteByPattern("movies:list:*");
 	}
 }

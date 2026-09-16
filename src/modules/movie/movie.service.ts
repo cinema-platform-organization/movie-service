@@ -112,6 +112,8 @@ export class MovieService {
 			categoryId: data.categoryId,
 		});
 
+		await this.movieCacheService.invalidateAllLists();
+
 		return { movie: MovieMapper.toMovie(movie) };
 	}
 
@@ -196,6 +198,7 @@ export class MovieService {
 		}
 
 		await this.invalidateCache(updated);
+		await this.movieCacheService.invalidateAllLists();
 
 		return { movie: MovieMapper.toMovie(updated) };
 	}
@@ -223,6 +226,7 @@ export class MovieService {
 		await this.movieRepository.delete(id);
 
 		await this.invalidateCache(existing);
+		await this.movieCacheService.invalidateAllLists();
 
 		return { ok: true };
 	}
