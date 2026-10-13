@@ -26,9 +26,11 @@ export class ScreeningClientGrpc implements OnModuleInit {
 		data: HasUpcomingScreeningsForMovieRequest,
 	) {
 		try {
-			return await lastValueFrom(
+			const res = await lastValueFrom(
 				this.screeningService.hasUpcomingScreeningsForMovie(data),
 			);
+
+			return { hasScreenings: res.hasScreenings ?? false };
 		} catch (error) {
 			this.logger.error(
 				{ err: error as Error, movieId: data.movieId },
