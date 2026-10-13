@@ -1,11 +1,13 @@
 import { RpcStatus } from "@cinema-platform/common";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
 
 import { CategoryRepository } from "./category.repository";
 
 @Injectable()
 export class CategoryService {
+	private readonly logger = new Logger(CategoryService.name);
+
 	public constructor(
 		private readonly categoryRepository: CategoryRepository,
 	) {}
@@ -32,6 +34,8 @@ export class CategoryService {
 	public async create(data: { title: string; slug?: string }) {
 		const category = await this.categoryRepository.create(data);
 
+		this.logger.log({ categoryId: category.id }, "Category created");
+
 		return { category };
 	}
 
@@ -50,6 +54,8 @@ export class CategoryService {
 		if (data.slug !== undefined) patch.slug = data.slug;
 
 		const category = await this.categoryRepository.update(id, patch);
+
+		this.logger.log({ categoryId: id }, "Category updated");
 
 		return { category };
 	}
@@ -75,6 +81,8 @@ export class CategoryService {
 		}
 
 		await this.categoryRepository.delete(id);
+
+		this.logger.log({ categoryId: id }, "Category deleted");
 
 		return { ok: true };
 	}

@@ -7,7 +7,7 @@ import {
 	ListMoviesResponse,
 	UpdateMovieRequest,
 } from "@cinema-platform/contracts/gen/ts/movie";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
 
 import { ScreeningClientGrpc } from "@/clients/screening-client.grpc";
@@ -20,6 +20,8 @@ import { MovieRepository } from "./movie.repository";
 
 @Injectable()
 export class MovieService {
+	private readonly logger = new Logger(MovieService.name);
+
 	public constructor(
 		private readonly movieRepository: MovieRepository,
 		private readonly movieCacheService: MovieCacheService,
@@ -114,6 +116,8 @@ export class MovieService {
 
 		await this.movieCacheService.invalidateAllLists();
 
+		this.logger.log({ movieId: movie.id }, "Movie created");
+
 		return { movie: MovieMapper.toMovie(movie) };
 	}
 
@@ -200,6 +204,8 @@ export class MovieService {
 		await this.invalidateCache(updated);
 		await this.movieCacheService.invalidateAllLists();
 
+		this.logger.log({ movieId: data.id }, "Movie updated");
+
 		return { movie: MovieMapper.toMovie(updated) };
 	}
 
@@ -227,6 +233,8 @@ export class MovieService {
 
 		await this.invalidateCache(existing);
 		await this.movieCacheService.invalidateAllLists();
+
+		this.logger.log({ movieId: id }, "Movie deleted");
 
 		return { ok: true };
 	}

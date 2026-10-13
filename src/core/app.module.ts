@@ -1,6 +1,6 @@
+import { MetricsModule, ServiceLoggerModule } from "@cinema-platform/common";
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
-import { LoggerModule } from "nestjs-pino";
 
 import { DatabaseModule } from "@/infrastructure/database/database.module";
 import { RedisModule } from "@/infrastructure/redis/redis.module";
@@ -17,7 +17,8 @@ import { MovieModule } from "@/modules/movie/movie.module";
 				".env",
 			],
 		}),
-		LoggerModule.forRoot(),
+		ServiceLoggerModule.forRoot("movie-service"),
+		MetricsModule.forRoot("movie-service"),
 		DatabaseModule,
 		RedisModule,
 		MovieModule,
