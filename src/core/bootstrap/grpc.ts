@@ -9,19 +9,22 @@ export function createGrpcServer(app: INestApplication, config: ConfigService) {
 
 	const url = `${host}:${port}`;
 
-	app.connectMicroservice<MicroserviceOptions>({
-		transport: Transport.GRPC,
-		options: {
-			package: ["movie.v1", "category.v1"],
-			protoPath: [PROTO_PATHS.MOVIE, PROTO_PATHS.CATEGORY],
-			url,
-			loader: {
-				keepCase: false,
-				longs: String,
-				enums: String,
-				defaults: true,
-				oneofs: true,
+	app.connectMicroservice<MicroserviceOptions>(
+		{
+			transport: Transport.GRPC,
+			options: {
+				package: ["movie.v1", "category.v1"],
+				protoPath: [PROTO_PATHS.MOVIE, PROTO_PATHS.CATEGORY],
+				url,
+				loader: {
+					keepCase: false,
+					longs: String,
+					enums: String,
+					defaults: true,
+					oneofs: true,
+				},
 			},
 		},
-	});
+		{ inheritAppConfig: true },
+	);
 }
