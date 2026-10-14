@@ -36,6 +36,7 @@ export class ScreeningClientGrpc implements OnModuleInit {
 				{ err: error as Error, movieId: data.movieId },
 				"Failed to check screenings for movie",
 			);
+
 			throw toRpcException(error, "Failed to check screenings for movie");
 		}
 	}
